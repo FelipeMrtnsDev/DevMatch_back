@@ -1,0 +1,166 @@
+// /prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums to maintain data consistency
+enum UserType {
+  developer
+  rh
+}
+
+enum Availability {
+  Available
+  Unavailable
+  Partial
+}
+
+// Main user table
+model User {
+  id                      Int                      @id @default(autoincrement())
+  fullName                String
+  email                   String                   @unique
+  passwordHash            String
+  userType                UserType
+  createdAt               DateTime                 @default(now())
+  
+  // Relations
+  developerProfile        DeveloperProfile?        // 1-to-1 relation to the profile
+  professionalExperiences ProfessionalExperience[] // 1-to-N relation to experiences
+  createdProjects         Project[]                @relation("ProjectCreator") // Projects this user created
+  projectParticipations   ProjectParticipant[]     // Projects this user participated in
+  createdVacancies        Vacancy[]                // Vacancies this user (RH) created
+  candidacies             Candidacy[]              // Applications this user (Dev) has made
+  competencies            UserCompetency[]         // Competencies this user has
+
+  @@map("users")
+}
+
+model DeveloperProfile {
+  userId          Int          @id // This is both PK and FK
+  bio             String?      @db.Text
+  location        String?
+  linkedinUrl     String?
+  githubUrl       String?
+  portfolioUrl    String?
+  availability    Availability @default(Available)
+  
+  // 1-to-1 relation to the user
+  user            User         @relation(fields: [userId], references: [id])
+
+  @@map("developer_profiles")
+}
+
+model ProfessionalExperience {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  jobTitle        String
+  companyName     String
+  description     String   @db.Text
+  startDate       DateTime @db.Date
+  endDate         DateTime?@db.Date
+  location        String?
+
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@map("professional_experiences")
+}
+
+model Project {
+  id              Int      @id @default(autoincrement())
+  creatorId       Int
+  title           String
+  description     String   @db.Text
+  repoUrl         String?
+  liveUrl         String?
+  completionDate  DateTime?@db.Date
+  
+  creator         User                 @relation("ProjectCreator", fields: [creatorId], references: [id])
+  participants    ProjectParticipant[]
+
+  @@map("projects")
+}
+
+model Vacancy {
+  id                  Int      @id @default(autoincrement())
+  postedById          Int
+  title               String
+  description         String   @db.Text
+  contractType        String   // Could also be an Enum
+  location            String
+  status              String   @default("Open")
+  publishedAt         DateTime @default(now())
+
+  postedBy            User                 @relation(fields: [postedById], references: [id])
+  requiredCompetencies VacancyCompetency[]
+  candidacies         Candidacy[]
+
+  @@map("vacancies")
+}
+
+model Competency {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+
+  users           UserCompetency[]
+  vacancies       VacancyCompetency[]
+
+  @@map("competencies")
+}
+
+// JOIN TABLES (Many-to-Many)
+
+model UserCompetency {
+  userId        Int
+  competencyId  Int
+  level         String // Beginner, Intermediate, Advanced
+
+  user          User       @relation(fields: [userId], references: [id])
+  competency    Competency @relation(fields: [competencyId], references: [id])
+
+  @@id([userId, competencyId])
+  @@map("user_competencies")
+}
+
+model ProjectParticipant {
+  projectId     Int
+  userId        Int
+  roleInProject String
+
+  project       Project @relation(fields: [projectId], references: [id])
+  user          User    @relation(fields: [userId], references: [id])
+
+  @@id([projectId, userId])
+  @@map("project_participants")
+}
+
+model VacancyCompetency {
+  vacancyId     Int
+  competencyId  Int
+  isRequired    Boolean @default(false)
+
+  vacancy       Vacancy    @relation(fields: [vacancyId], references: [id])
+  competency    Competency @relation(fields: [competencyId], references: [id])
+
+  @@id([vacancyId, competencyId])
+  @@map("vacancy_competencies")
+}
+
+model Candidacy {
+  id            Int      @id @default(autoincrement())
+  vacancyId     Int
+  userId        Int
+  appliedAt     DateTime @default(now())
+  status        String   @default("Received")
+
+  vacancy       Vacancy  @relation(fields: [vacancyId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@map("candidacies")
+}
