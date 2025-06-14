@@ -28,7 +28,7 @@ const userController = new UserController(
 );
 
 router.get("/users", ensureAuthenticated, async (req, res) => {
-  await userController.list(req, res); //ok
+  await userController.list(req, res); 
 });
 
 router.get("/user/:id" ,ensureAuthenticated, async (req, res) => {
@@ -36,19 +36,19 @@ router.get("/user/:id" ,ensureAuthenticated, async (req, res) => {
 })
 
 router.delete("/user/:id", ensureAuthenticated, async (req, res) => {
-  await userController.delete(req, res); //ok
+  await userController.delete(req, res); 
 });
 
 router.post("/user", async (req, res) => {
-  await userController.create(req, res); //ok
+  await userController.create(req, res); 
 });
 
 router.put("/user", ensureAuthenticated, async (req, res) => {
-  await userController.update(req, res); //ok
+  await userController.update(req, res); 
 });
 
 router.post("/login", async (req, res) => {
-  await userController.authenticate(req, res); //ok
+  await userController.authenticate(req, res); 
 });
 
 export { router };

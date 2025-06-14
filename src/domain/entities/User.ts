@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 export type UserType = 'DEV' | 'RH' | 'ADMIN';
 
 interface UserProps {
-  id: number;
+  id: string;
   fullName: string;
   email: string;
   passwordHash: string;
@@ -13,13 +13,13 @@ interface UserProps {
 }
 
 export class User {
-  public readonly id: number;
-  public readonly fullName: string;
-  public readonly email: string;
-  private readonly passwordHash: string;
+  public readonly id: string;
+  public fullName: string;
+  public email: string;
+  private passwordHash: string;
   public readonly userType: UserType;
   public readonly createdAt: Date;
-  public readonly picture?: string | null;
+  public  picture?: string | null;
 
   constructor(props: UserProps) {
     this.id = props.id;
@@ -29,6 +29,14 @@ export class User {
     this.userType = props.userType;
     this.createdAt = props.createdAt;
     this.picture = props.picture ?? null;
+  }
+
+  public updateFullName(newName: string) {
+    this.fullName = newName;
+  }
+
+  public updatePicture(newPicture: string) {
+    this.picture = newPicture;
   }
 
   async isPasswordValid(plainPassword: string): Promise<boolean> {

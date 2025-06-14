@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { CreateUserUseCase } from "../../application/use-cases/User-usecase/CreateUserUseCase.js";
-import { ListUsersUseCase } from "../../application/use-cases/User-usecase/ListUsersUseCase.js";
-import { AuthenticateUserUseCase } from "../../application/use-cases/User-usecase/AuthenticateUserUseCase.js";
-import { DeleteUserUseCase } from "src/application/use-cases/User-usecase/DeleteUserUseCase.js";
-import { ListOneUserUseCase } from "src/application/use-cases/User-usecase/ListOneUserUseCase.js";
+import { CreateUserUseCase } from "../../application/use-cases/userUseCase/CreateUserUseCase";
+import { ListUsersUseCase } from "../../application/use-cases/userUseCase/ListUserUseCase";
+import { AuthenticateUserUseCase } from "../../application/use-cases/userUseCase/AuthenticateUserUseCase";
+import { DeleteUserUseCase } from "src/application/use-cases/userUseCase/DeleteUserUseCase";
+import { ListOneUserUseCase } from "src/application/use-cases/userUseCase/ListOneUserUseCase";
 import jwt from "jsonwebtoken"
-import { UpdateUserUseCase } from "src/application/use-cases/User-usecase/UpdateUserUseCase.js";
+import { UpdateUserUseCase } from "src/application/use-cases/userUseCase/UpdateUserUseCase";
 
 export class UserController {
   constructor(
@@ -18,15 +18,14 @@ export class UserController {
   ) {}
 
   async create(req: Request, res: Response): Promise<Response> {
-    const { name, email, password, picture, username } = req.body;
+    const { fullName, email, password, userType } = req.body;
 
     try {
       await this.createUserUseCase.execute({
-        name,
         email,
+        fullName,
         password,
-        picture,
-        username,
+        userType
       });
       return res.status(201).send();
     } catch (error) {
@@ -69,7 +68,7 @@ export class UserController {
     const id = req.params.id;
 
     try {
-      const users = await this.deleteUserUseCase.execute({ id });
+      const users = await this.deleteUserUseCase.execute(id);
       return res.status(204).json(users);
     } catch (error) {
       const err = error as Error;
@@ -83,8 +82,7 @@ export class UserController {
     try {
       const token = await this.authenticateUserUseCase.execute({
         email,
-        password,
-        name,
+        password
       });
       return res.status(200).send({ token });
     } catch (error) {
@@ -94,16 +92,13 @@ export class UserController {
   }
 
   async update(req: Request, res: Response): Promise<Response> {
-    const { name, email, password, picture, username, id } = req.body;
+    const { fullName, picture , id } = req.body;
 
     try {
       await this.updateUserUseCase.execute({
         id,
-        name,
-        email,
-        password,
-        picture,
-        username,
+        fullName,
+        picture
       });
       return res.status(201).send();
     } catch (error) {

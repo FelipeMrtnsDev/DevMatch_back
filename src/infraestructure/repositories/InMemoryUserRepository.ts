@@ -1,5 +1,5 @@
 import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { User } from "../../domain/entities/User.js";
+import { User, UserType } from "../../domain/entities/User.js";
 
 export class InMemoryUserRepository implements IUserRepository {
   private users: User[] = []
@@ -12,8 +12,21 @@ export class InMemoryUserRepository implements IUserRepository {
       return this.users.find(user => user.email === email) || null;
   }
 
+  async findByType(userType: UserType): Promise<User[]> {
+    return this.users.filter(user => user.userType === userType);
+  }
+
+  async count(): Promise<number> {
+    return this.users.length;
+  }
+
   async list(): Promise<User[]> {
     return this.users;
+  }
+
+  async paginate(page: number, perPage: number): Promise<User[]> {
+    const start = (page - 1) * perPage;
+    return this.users.slice(start, start + perPage);
   }
 
   async listOne(id: string): Promise<User> {
