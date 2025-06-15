@@ -3,7 +3,6 @@ import { CreateUserUseCase } from "../../application/use-cases/userUseCase/Creat
 import { ListUsersUseCase } from "../../application/use-cases/userUseCase/ListUserUseCase";
 import { AuthenticateUserUseCase } from "../../application/use-cases/userUseCase/AuthenticateUserUseCase";
 import { DeleteUserUseCase } from "src/application/use-cases/userUseCase/DeleteUserUseCase";
-import { ListOneUserUseCase } from "src/application/use-cases/userUseCase/ListOneUserUseCase";
 import jwt from "jsonwebtoken"
 import { UpdateUserUseCase } from "src/application/use-cases/userUseCase/UpdateUserUseCase";
 import { CountUsersUseCase } from "src/application/use-cases/userUseCase/CountUsersUseCase";
@@ -19,7 +18,6 @@ export class UserController {
     private listUsersUseCase: ListUsersUseCase,
     private authenticateUserUseCase: AuthenticateUserUseCase,
     private deleteUserUseCase: DeleteUserUseCase,
-    private listOneUserUseCase: ListOneUserUseCase,
     private updateUserUseCase: UpdateUserUseCase,
     private countUserUseCase: CountUsersUseCase,
     private paginateUserUseCase: PaginateUsersUseCase,
@@ -107,26 +105,6 @@ export class UserController {
     } catch (error) {
       const err = error as Error;
       return res.status(400).json({ message: err.message });
-    }
-  }
-
-  async listOne(req: Request, res: Response): Promise<Response> {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Token não fornecido" });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
-
-      const user = await this.listOneUserUseCase.execute(decoded.id);
-      return res.status(200).json(user);
-    } catch (error) {
-      const err = error as Error;
-      return res.status(401).json({ message: "Token inválido: " + err.message });
     }
   }
 

@@ -7,7 +7,6 @@ import { CreateUserUseCase } from "src/application/use-cases/userUseCase/CreateU
 import { ListUsersUseCase } from "src/application/use-cases/userUseCase/ListUserUseCase";
 import { AuthenticateUserUseCase } from "src/application/use-cases/userUseCase/AuthenticateUserUseCase.js";
 import { DeleteUserUseCase } from "src/application/use-cases/userUseCase/DeleteUserUseCase.js";
-import { ListOneUserUseCase } from "src/application/use-cases/userUseCase/ListOneUserUseCase.js";
 import { UpdateUserUseCase } from "src/application/use-cases/userUseCase/UpdateUserUseCase.js";
 import { CountUsersUseCase } from "src/application/use-cases/userUseCase/CountUsersUseCase.js";
 import { PaginateUsersUseCase } from "src/application/use-cases/userUseCase/PaginateUsersUseCase.js";
@@ -23,7 +22,6 @@ const createUserUseCase = new CreateUserUseCase(userRepository);
 const listUsersUseCase = new ListUsersUseCase(userRepository);
 const authenticateUserUseCase = new AuthenticateUserUseCase(userRepository);
 const deleteUserUseCase = new DeleteUserUseCase(userRepository);
-const listOneUserUseCase = new ListOneUserUseCase(userRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
 const countUserUseCase = new CountUsersUseCase(userRepository);
 const paginateUserUseCase = new PaginateUsersUseCase(userRepository);
@@ -37,7 +35,6 @@ const userController = new UserController(
   listUsersUseCase,
   authenticateUserUseCase,
   deleteUserUseCase,
-  listOneUserUseCase,
   updateUserUseCase,
   countUserUseCase,
   paginateUserUseCase,
@@ -58,10 +55,6 @@ router.post("/user", async (req, res) => {
 
 router.get("/users", ensureAuthenticated, async (req, res) => {
   await userController.list(req, res);
-});
-
-router.get("/user/:id", ensureAuthenticated, async (req, res) => {
-  await userController.listOne(req, res);
 });
 
 router.put("/user", ensureAuthenticated, async (req, res) => {
