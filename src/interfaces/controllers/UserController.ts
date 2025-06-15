@@ -6,6 +6,12 @@ import { DeleteUserUseCase } from "src/application/use-cases/userUseCase/DeleteU
 import { ListOneUserUseCase } from "src/application/use-cases/userUseCase/ListOneUserUseCase";
 import jwt from "jsonwebtoken"
 import { UpdateUserUseCase } from "src/application/use-cases/userUseCase/UpdateUserUseCase";
+import { CountUsersUseCase } from "src/application/use-cases/userUseCase/CountUsersUseCase";
+import { PaginateUsersUseCase } from "src/application/use-cases/userUseCase/PaginateUsersUseCase";
+import { FindUserByIdUseCase } from "src/application/use-cases/userUseCase/FindUserByIdUseCase";
+import { FindUsersByTypeUseCase } from "src/application/use-cases/userUseCase/FindUsersByTypeUseCase";
+import { FindUserByEmailUseCase } from "src/application/use-cases/userUseCase/FindUserByEmailUseCase";
+import { UserType } from "src/domain/entities/User";
 
 export class UserController {
   constructor(
@@ -14,8 +20,58 @@ export class UserController {
     private authenticateUserUseCase: AuthenticateUserUseCase,
     private deleteUserUseCase: DeleteUserUseCase,
     private listOneUserUseCase: ListOneUserUseCase,
-    private updateUserUseCase: UpdateUserUseCase
+    private updateUserUseCase: UpdateUserUseCase,
+    private countUserUseCase: CountUsersUseCase,
+    private paginateUserUseCase: PaginateUsersUseCase,
+    private findByIdUserUseCase: FindUserByIdUseCase,
+    private findByTypeUserUseCase: FindUsersByTypeUseCase,
+    private findUserByEmailUseCase: FindUserByEmailUseCase
   ) {}
+
+  async findByEmail(req: Request, res: Response): Promise<Response> {
+    const email = req.query.email as string;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email é obrigatório" });
+    }
+
+    try {
+      const user = await this.findUserByEmailUseCase.execute(email);
+
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      return res.status(200).json(user);
+    } catch (error) {
+      const err = error as Error;
+      return res.status(500).json({ message: err.message });
+    }
+  }
+
+  async findById(req: Request, res: Response): Promise<Response> {
+    const id = req.params.id;
+
+    try {
+      const user = await this.findByIdUserUseCase.execute(id);
+      return res.status(200).json(user);
+    } catch (error) {
+      const err = error as Error;
+      return res.status(404).json({ message: err.message });
+    }
+  }
+
+  async findByType(req: Request, res: Response): Promise<Response> {
+    const userType = req.params.type as UserType;
+
+    try {
+      const users = await this.findByTypeUserUseCase.execute(userType);
+      return res.status(200).json(users);
+    } catch (error) {
+      const err = error as Error;
+      return res.status(400).json({ message: err.message });
+    }
+  }
 
   async create(req: Request, res: Response): Promise<Response> {
     const { fullName, email, password, userType } = req.body;
@@ -44,6 +100,16 @@ export class UserController {
     }
   }
 
+  async count(req: Request, res: Response): Promise<Response> {
+    try {
+      const totalUsers = await this.countUserUseCase.execute();
+      return res.status(200).json({ totalUsers });
+    } catch (error) {
+      const err = error as Error;
+      return res.status(400).json({ message: err.message });
+    }
+  }
+
   async listOne(req: Request, res: Response): Promise<Response> {
     const authHeader = req.headers.authorization;
 
@@ -63,6 +129,20 @@ export class UserController {
       return res.status(401).json({ message: "Token inválido: " + err.message });
     }
   }
+
+  async paginate(req: Request, res: Response): Promise<Response> {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const perPage = Math.max(1, Number(req.query.perPage) || 10);
+
+    try {
+      const users = await this.paginateUserUseCase.execute(page, perPage);
+      return res.status(200).json(users);
+    } catch (error) {
+      const err = error as Error;
+      return res.status(400).json({ message: err.message });
+    }
+  }
+
 
   async delete(req: Request, res: Response): Promise<Response> {
     const id = req.params.id;
