@@ -1,22 +1,38 @@
 import bcrypt from "bcrypt";
 export class User {
-    props;
+    id;
+    fullName;
+    email;
+    passwordHash;
+    userType;
+    createdAt;
+    picture;
     constructor(props) {
-        this.props = props;
+        this.id = props.id;
+        this.fullName = props.fullName;
+        this.email = props.email;
+        this.passwordHash = props.passwordHash;
+        this.userType = props.userType;
+        this.createdAt = props.createdAt;
+        this.picture = props.picture ?? null;
     }
-    get id() {
-        return this.props.id;
+    updateFullName(newName) {
+        this.fullName = newName;
     }
-    get name() {
-        return this.props.name;
-    }
-    get email() {
-        return this.props.email;
-    }
-    get password() {
-        return this.props.password;
+    updatePicture(newPicture) {
+        this.picture = newPicture;
     }
     async isPasswordValid(plainPassword) {
-        return bcrypt.compare(plainPassword, this.props.password);
+        return bcrypt.compare(plainPassword, this.passwordHash);
+    }
+    getPublicProfile() {
+        return {
+            id: this.id,
+            fullName: this.fullName,
+            email: this.email,
+            userType: this.userType,
+            picture: this.picture,
+            createdAt: this.createdAt,
+        };
     }
 }

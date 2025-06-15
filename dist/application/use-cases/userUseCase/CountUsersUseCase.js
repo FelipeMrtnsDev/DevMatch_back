@@ -1,9 +1,9 @@
-export class ListUserUseCase {
+export class CountUsersUseCase {
     userRepository;
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
     async execute() {
-        return await this.userRepository.list();
+        return this.userRepository.count();
     }
 }

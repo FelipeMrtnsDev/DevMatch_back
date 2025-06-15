@@ -7,7 +7,7 @@ export function ensureAuthenticated(req, res, next) {
     }
     const [, token] = authHeader.split(" ");
     try {
-        const decoded = jwt.verify(token, "secreta123");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = {
             id: decoded.id,
         };
