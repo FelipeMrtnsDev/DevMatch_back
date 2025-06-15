@@ -14,11 +14,10 @@ import { PaginateUsersUseCase } from "src/application/use-cases/userUseCase/Pagi
 import { FindUserByIdUseCase } from "src/application/use-cases/userUseCase/FindUserByIdUseCase.js";
 import { FindUsersByTypeUseCase } from "src/application/use-cases/userUseCase/FindUsersByTypeUseCase.js";
 import { FindUserByEmailUseCase } from "src/application/use-cases/userUseCase/FindUserByEmailUseCase.js";
-import { InMemoryUserRepository } from "src/infraestructure/repositories/InMemoryUserRepository";
 
 const router = Router();
 
-const userRepository = new InMemoryUserRepository();
+const userRepository = new PrismaUserRepository();
 
 const createUserUseCase = new CreateUserUseCase(userRepository);
 const listUsersUseCase = new ListUsersUseCase(userRepository);

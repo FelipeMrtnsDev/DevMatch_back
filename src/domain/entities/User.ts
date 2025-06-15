@@ -39,6 +39,10 @@ export class User {
     this.picture = newPicture;
   }
 
+  public get getPasswordHash(): string {
+    return this.passwordHash;
+  }
+
   async isPasswordValid(plainPassword: string): Promise<boolean> {
     return bcrypt.compare(plainPassword, this.passwordHash);
   }

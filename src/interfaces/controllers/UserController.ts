@@ -157,14 +157,14 @@ export class UserController {
   }
 
   async authenticate(req: Request, res: Response): Promise<Response> {
-    const { email, password, name } = req.body;
+    const { email, password } = req.body;
 
     try {
-      const token = await this.authenticateUserUseCase.execute({
+      const authResponse = await this.authenticateUserUseCase.execute({
         email,
-        password
+        password,
       });
-      return res.status(200).send({ token });
+      return res.status(200).json(authResponse);
     } catch (error) {
       const err = error as Error;
       return res.status(400).json({ message: err.message });

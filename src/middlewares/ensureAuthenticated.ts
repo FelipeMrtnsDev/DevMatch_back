@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 interface Payload {
-  id: string;
+  userId: string;
 }
 
 export function ensureAuthenticated(req: Request, res: Response, next: NextFunction): void {
@@ -16,10 +16,12 @@ export function ensureAuthenticated(req: Request, res: Response, next: NextFunct
   const [, token] = authHeader.split(" ");
 
   try {
+    console.log("SEGREDO NA VERIFICAÇÃO:", process.env.JWT_SECRET);
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as Payload;
 
     req.user = {
-      id: decoded.id,
+      id: decoded.userId,
     };
 
     next();

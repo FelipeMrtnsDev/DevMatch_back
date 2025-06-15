@@ -33,6 +33,8 @@ export class AuthenticateUserUseCase {
       throw new Error("Usuário ou senha inválidos.");
     }
 
+    console.log("SEGREDO NA CRIAÇÃO:", process.env.JWT_SECRET);
+
     const token = jwt.sign(
       { userId: user.id, userType: user.userType },
       process.env.JWT_SECRET || "your_jwt_secret",

@@ -9,24 +9,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserType {
-  developer
-  rh
-}
-
 enum Availability {
   Available
   Unavailable
   Partial
 }
+enum UserType {
+  DEV
+  RH
+  ADMIN
+}
 
 model User {
-  // CORRETO: Chave primária como UUID String.
-  id                      String                   @id @default(uuid())
+  id                      String    @id @default(uuid())
   fullName                String
-  email                   String                   @unique
+  email                   String    @unique
   passwordHash            String
-  userType                UserType
+  userType                UserType 
   createdAt               DateTime                 @default(now())
 
   developerProfile        DeveloperProfile?
